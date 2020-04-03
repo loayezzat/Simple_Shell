@@ -98,10 +98,14 @@ printf("\033[0m"); // Reset text color
 
 void parsing_command(char*input , char **parameters){
 char * first_cmd  = input;
-
+unsigned char dir_flag = 0 ;
  while (*input != '\0') {       /* if not the end of input ....... */
 
-          while (*input == ' ' || *input == '\t' || *input == '\n' ||*input == '&'){
+           while ((*input == ' ' || *input == '\t' || *input == '\n' ||*input == '&' ||*input == '"' )&& dir_flag ==0 ){
+               if(*input=='"'){dir_flag=1;
+               input++;
+               }
+               else{
                if(*input == '&'){
 
                  wait_flag = 1 ; /*Check for the & and  replace it and set the flagg */
@@ -109,12 +113,18 @@ char * first_cmd  = input;
 
                *input++ = '\0';     /* replace white spaces with 0    */
 
-          }
+         } }
           *parameters++ = input;     /* save the argument position     */
 
 
-          while (*input != '\0' && *input != ' ' &&
-                 *input != '\t' && *input != '\n')
+          if(dir_flag==1){
+            while(*input != '"')
+            input++ ;
+
+          *input++ = '\0';
+          dir_flag = 0 ;  }
+        while ((*input != '\0' && *input != ' ' &&
+                 *input != '\t' && *input != '\n' && *input != '"') && dir_flag == 0)
                input++;             /* skip the argument until ...    */
      }
      if(strcmp(first_cmd,"ls")==0){
