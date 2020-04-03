@@ -33,7 +33,7 @@ input = malloc(4098);
 
     if (fork_return == -1)
     {
-
+printf("Forking failed,Child process can't be created \n");
 
     }else if (fork_return == 0 )
     {
