@@ -1,11 +1,12 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
 void type_prompt(void) ;
-void read_command(char *input, char **parameters) ;
-
+void parsing_command(char *input, char **parameters) ;
+unsigned char  wait_flag  = 0 ;
 int main()
 {
     pid_t fork_return;
@@ -21,7 +22,9 @@ input = malloc(4098);
     while(1){
             type_prompt() ;
             fgets(input, 4098,stdin);
-            read_command(input ,parameters);
+            parsing_command(input ,parameters);
+
+
 
 
     //forking
@@ -30,23 +33,27 @@ input = malloc(4098);
 
     if (fork_return == -1)
     {
-        printf("Forking failed, child process can't be created\n") ;
+
 
     }else if (fork_return == 0 )
     {
         //child process excution
 
         execvp(parameters[0], parameters) ;
-        printf("\n");
+
+        exit(0);
+
 
     }else
     {
         //parent process excution
 
-
-
-
-
+        if(wait_flag ==0)
+        wait(NULL);
+        else{
+        wait_flag= 0 ;
+        printf("%d \n",fork_return);
+        }
         if ( strcmp(parameters[0] ,"exit")==0 )
         {   free(input);
             exit(0);
@@ -69,12 +76,21 @@ printf("ALOShell $ ");
 
 }
 
-void read_command(char*input , char **parameters){
+void parsing_command(char*input , char **parameters){
 
 
  while (*input != '\0') {       /* if not the end of input ....... */
-          while (*input == ' ' || *input == '\t' || *input == '\n')
+
+
+
+          while (*input == ' ' || *input == '\t' || *input == '\n' ||*input == '&'){
+               if(*input == '&'){
+                 wait_flag = 1 ;
+               }
+
                *input++ = '\0';     /* replace white spaces with 0    */
+
+          }
           *parameters++ = input;          /* save the argument position     */
           while (*input != '\0' && *input != ' ' &&
                  *input != '\t' && *input != '\n')
@@ -84,20 +100,6 @@ void read_command(char*input , char **parameters){
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
