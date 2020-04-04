@@ -47,15 +47,24 @@ input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Run
             printf("Forking failed,Child process can't be created \n");
 
         }else if (fork_return == 0 )
-            {
-        //child process excution
+        {
+            //child process excution
 
-            execvp(parameters[0], parameters) ;  // pass parameters list to execvp which change the enviroment to another process "the desired command "
-            // just  for formating style  ERROR will be printed if the execvp failed else it won't return to the code again
-            if(strcmp(parameters[0] ,"exit")!=0)
-            printf("ERROR: Wrong Command\n");
+            if ( (strcmp(parameters[0] ,"cd")!=0) && (strcmp(parameters[0] ,"exit")!=0) )
+            {
+            /* pass parameters list to execvp which change the enviroment to another process "the desired command "*/
+                execvp(parameters[0], parameters) ;
+
+            /** just  for formating style  ERROR will be printed if the execvp failed
+            else it won't return to the code again **/
+
+            /**This line can't be reached if command is cd or exit
+             also it can't be reached if execvp work properly**/
+                printf("ERROR: Wrong Command\n");
+            }
 
             exit(0);
+
 
         }else
         {
@@ -71,8 +80,11 @@ input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Run
             }
 
         //Check for exit call
+            if (strcmp(parameters[0] ,"cd")==0)
+            {
+                chdir(parameters[1]);
 
-            if ( strcmp(parameters[0] ,"exit")==0 )
+            }else if ( strcmp(parameters[0] ,"exit")==0 )
             {
                 // Free the allocated mem for the input
                 free(input);
@@ -129,7 +141,7 @@ unsigned char dir_flag = 0 ;
                input++;             /* skip the argument until ...    */
      }
      if(strcmp(first_cmd,"ls")==0){
-            *(parameters-1) = color_string;
+            *(parameters-1) = (char *)color_string;
             *parameters = NULL ;
             }
     else
@@ -162,4 +174,3 @@ while(read_error_check(input)){
 }
 
 }
-

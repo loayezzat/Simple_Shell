@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1585957018 source:/home/loay/os_project/main.c
+	<stdio.h>
+	<stdlib.h>
+	<sys/wait.h>
+	<unistd.h>
+	<string.h>
+
