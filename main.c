@@ -65,6 +65,7 @@ input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Run
             if(wait_flag ==0)
                 wait(NULL);
             else{
+
                 wait_flag= 0 ;
                 printf("%d \n",fork_return);
             }
