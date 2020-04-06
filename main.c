@@ -12,22 +12,25 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
-
+#include <time.h>
 
 void type_prompt(void) ; // Fuction which called to promet the fixed header "ALO SHELL $" also used for color formating
 void parsing_command(char *input, char **parameters) ; // This Function handle the input and point to every argument start
 unsigned char read_error_check(char *input); // this fuucntion check the input for error to avoid segmentation errors !
 void read_command(char *input); // this fuction read the input
+void child_die_handler(int sig);// this function handle the interrupt signal form child death
 unsigned char  wait_flag  = 0 ; // simple flag to chech whether the parent MUST wait or not
 const char * color_string = "--color"; // the color argument for LS which is add in the parsing part if the command is LS
 
 int main()
 {
+
+
     pid_t fork_return; // shall hold process id
     char *input ;
     char  *parameters[64];
 
-
+signal(SIGCHLD,child_die_handler);
 input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Runtime errors
 
 
@@ -174,3 +177,22 @@ while(read_error_check(input)){
 }
 
 }
+
+
+void child_die_handler(int sig){
+
+pid_t pid;
+pid= wait(NULL);
+
+time_t rawtime;
+struct tm * timeinfo;
+time(&rawtime);
+timeinfo = localtime(&rawtime);
+
+
+
+
+printf("Death %d %s\n",pid,asctime(timeinfo));
+//signal(SIGCHLD,child_die_handler);
+}
+
