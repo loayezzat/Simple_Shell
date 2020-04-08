@@ -3,7 +3,7 @@
 ##################ALO SHELL####################
 ################# MADE BY . ###################
 ######### OMAR MOHAMED GHANEM 166 #############
-######### AMR KHALID RAMADAN  177 #############
+######### AMR KHALED RAMADAN  177 #############
 ############# LOAY EZZAT 199  #################
 **/
 
@@ -169,7 +169,6 @@ fgets(input, 4098,stdin); //Reads the input MAX size is 4098
 while(read_error_check(input)){
     type_prompt();
     fgets(input, 4098,stdin);
-
 }
 
 }
