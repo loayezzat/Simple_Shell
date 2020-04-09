@@ -3,7 +3,7 @@
 ##################ALO SHELL####################
 ################# MADE BY . ###################
 ######### OMAR MOHAMED GHANEM 166 #############
-######### AMR KHALID RAMADAN  177 #############
+######### AMR KHALED RAMADAN  177 #############
 ############# LOAY EZZAT 199  #################
 **/
 
@@ -13,7 +13,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
-#include<signal.h> 
+#include<signal.h>
 #include <syslog.h>
 
 
@@ -35,7 +35,7 @@ int main()
 	input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Runtime errors
 
 	signal(SIGCHLD, sigchld_handler); // handler function for the logging
-	
+
 	// The shell core
     while(1){
 
@@ -95,19 +95,20 @@ free(input);
 return 0;
 }
 
+
 #define LOG(lf, msg) fprintf(lf, "process: %d: LOG (%u): %s\n", getpid(), time(0), (msg))
 void sigchld_handler(int num){
 	//writing to a simple text file
 	FILE *log_p = fopen("logfile.txt" , "a");
-	fprintf(fp, "Child process: %d was terminated\n", getpid());
+	fprintf(log_p, "Child process: %d was terminated\n", getpid());
     //fputs("Child process was terminated 3\n", fp);
 	fclose(log_p);
-	
+
 	//another possible approach for log files
 	FILE *log = fopen("logfile2.log", "a");
 	LOG(log, "Child process was terminated");
 	fclose(log);
-		
+
 	//writing to the main log file
 	openlog("ALOShell", 0, LOG_USER);
 	//openlog("ALOShell", LOG_PID, LOG_USER); //or LOG_LOCAL1 instead of LOG_USER
@@ -143,9 +144,9 @@ while(*input != '\0') {       /* if not the end of input ....... */
 				 wait_flag = 1 ; /*Check for the & and  replace it and set the flagg */
 			   }
 			   *input++ = '\0';     /* replace white spaces with 0    */
-			} 
+			}
 		}
-		
+
 	  *parameters++ = input;     /* save the argument position     */
 
 	  if(dir_flag==1){
@@ -153,21 +154,21 @@ while(*input != '\0') {       /* if not the end of input ....... */
 				input++ ;
 
 		   *input++ = '\0';
-		   dir_flag = 0 ;  
+		   dir_flag = 0 ;
 		}
-	  
+
 	  while((*input != '\0' && *input != ' ' &&
 			 *input != '\t' && *input != '\n' && *input != '"') && dir_flag == 0)
 		   input++;             /* skip the argument until ...    */
     }
 
-/* mark the end of argument list  */ 
+/* mark the end of argument list  */
 if(strcmp(first_cmd,"ls")==0){
 	*(parameters-1) = (char *)color_string;
 	*parameters = NULL ;
 	}
 else
-	*(parameters-1) = NULL;                 
+	*(parameters-1) = NULL;
 
 }
 
@@ -180,7 +181,7 @@ while(*(input + i) != '\0'){
      return 0 ; // return 0 ===> NO ERROR
     i++;
 	}
-	
+
 return 1 ; //return 1 ====>ERROR
 }
 
