@@ -7,12 +7,14 @@
 ############# LOAY EZZAT 199  #################
 **/
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+
 
 void type_prompt(void) ; // Fuction which called to promet the fixed header "ALO SHELL $" also used for color formating
 void parsing_command(char *input, char **parameters,unsigned char * wait_flag) ; // This Function handle the input and point to every argument start
@@ -21,29 +23,23 @@ void read_command(char *input); // this function read the input
 char * time_stamper(void);//this function assign the  system time
 void child_die_handler(int sig);// this function handle the interrupt signal form child death
 const char * color_string = "--color"; // the color argument for LS which is add in the parsing part if the command is LS
+
+
 int main()
 {
-
-
-
     char *input ;
     char  *parameters[64];
     static unsigned char wait_flag = 0 ; // simple flag to chech whether the parent MUST wait or not
     pid_t fork_return; //  hold process id
     signal(SIGCHLD,child_die_handler); // map the handler to the interrupt signal
-      // Dynamic allocation for the input to avoid  memory Runtime errors
-
-
+    // Dynamic allocation for the input to avoid  memory Runtime errors
 
 // The shell core
     while(1){
 
-                    input = malloc(4098);
-                    read_command(input);
-                    parsing_command(input ,parameters,&wait_flag);
-
-
-
+        input = malloc(4098);
+        read_command(input);
+        parsing_command(input ,parameters,&wait_flag);
 
     //forking
 
@@ -56,9 +52,6 @@ int main()
         }else if (fork_return == 0 )
         {
             //child process excution
-
-
-
 
             if ( (strcmp(parameters[0] ,"cd")!=0) && (strcmp(parameters[0] ,"exit")!=0) )
             {
@@ -97,13 +90,14 @@ int main()
             }else if ( strcmp(parameters[0] ,"exit")==0 )
             {
                 // Free the allocated mem for the input
+                FILE *log_p = fopen("logfile.log" , "a");
+                fprintf(log_p, "Shell session terminated %s \n",time_stamper());
                 free(input);
                 exit(0);
         }
 
     }
     }
-
 
 // Free the allocated mem for the input
 free(input);
@@ -187,10 +181,7 @@ while(read_error_check(input)){
 void child_die_handler(int sig){
 static unsigned char open_flag = 0;
 
-
-
-
-    FILE *log_p = fopen("logfile.txt" , "a");
+    FILE *log_p = fopen("logfile.log" , "a");
     if(open_flag == 0){
     fprintf(log_p, "Shell new session  %s \n",time_stamper());
     open_flag = 1 ;
@@ -199,8 +190,6 @@ static unsigned char open_flag = 0;
 	fprintf(log_p, "Child process was terminated ,%s \n",time_stamper());
     //fputs("Child process was terminated 3\n", fp);
 	fclose(log_p);
-
-
 }
 
 char * time_stamper(void){
@@ -210,7 +199,3 @@ time(&rawtime);
 timeinfo = localtime(&rawtime);
 return asctime(timeinfo) ;
 }
-
-
-
-
