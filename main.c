@@ -15,31 +15,35 @@
 #include <time.h>
 
 void type_prompt(void) ; // Fuction which called to promet the fixed header "ALO SHELL $" also used for color formating
-void parsing_command(char *input, char **parameters) ; // This Function handle the input and point to every argument start
+void parsing_command(char *input, char **parameters,unsigned char * wait_flag) ; // This Function handle the input and point to every argument start
 unsigned char read_error_check(char *input); // this fuucntion check the input for error to avoid segmentation errors !
-void read_command(char *input); // this fuction read the input
+void read_command(char *input); // this function read the input
+char * time_stamper(void);//this function assign the  system time
 void child_die_handler(int sig);// this function handle the interrupt signal form child death
-unsigned char  wait_flag  = 0 ; // simple flag to chech whether the parent MUST wait or not
 const char * color_string = "--color"; // the color argument for LS which is add in the parsing part if the command is LS
-
 int main()
 {
 
 
-    pid_t fork_return; // shall hold process id
+
     char *input ;
     char  *parameters[64];
-
-signal(SIGCHLD,child_die_handler);
-input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Runtime errors
+    static unsigned char wait_flag = 0 ; // simple flag to chech whether the parent MUST wait or not
+    pid_t fork_return; //  hold process id
+    signal(SIGCHLD,child_die_handler); // map the handler to the interrupt signal
+      // Dynamic allocation for the input to avoid  memory Runtime errors
 
 
 
 // The shell core
     while(1){
 
-        read_command(input);
-        parsing_command(input ,parameters);
+                    input = malloc(4098);
+                    read_command(input);
+                    parsing_command(input ,parameters,&wait_flag);
+
+
+
 
     //forking
 
@@ -52,6 +56,9 @@ input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Run
         }else if (fork_return == 0 )
         {
             //child process excution
+
+
+
 
             if ( (strcmp(parameters[0] ,"cd")!=0) && (strcmp(parameters[0] ,"exit")!=0) )
             {
@@ -74,10 +81,10 @@ input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Run
             //parent process excution
             // if & is in the command parent process will wait ;
 
-            if(wait_flag ==0)
-                wait(NULL);
+            if(wait_flag ==0){
+                waitpid(fork_return,NULL, 0);
+            }
             else{
-
                 wait_flag= 0 ;
                 printf("%d \n",fork_return);
             }
@@ -94,7 +101,8 @@ input = malloc(4098);   // Dynamic allocation for the input to avoid  memory Run
                 exit(0);
         }
 
-    }}
+    }
+    }
 
 
 // Free the allocated mem for the input
@@ -102,7 +110,7 @@ free(input);
 return 0;
 }
 
-
+/**###############################################################**/
 
 
 void type_prompt(void){
@@ -112,7 +120,7 @@ printf("\033[0m"); // Reset text color
 
 }
 
-void parsing_command(char*input , char **parameters){
+void parsing_command(char*input , char **parameters,unsigned char * wait_flag){
 char * first_cmd  = input;
 unsigned char dir_flag = 0 ;
  while (*input != '\0') {       /* if not the end of input ....... */
@@ -124,7 +132,7 @@ unsigned char dir_flag = 0 ;
                else{
                if(*input == '&'){
 
-                 wait_flag = 1 ; /*Check for the & and  replace it and set the flagg */
+                 *wait_flag = 1 ; /*Check for the & and  replace it and set the flagg */
                }
 
                *input++ = '\0';     /* replace white spaces with 0    */
@@ -169,30 +177,40 @@ void read_command(char *input){
 /** this fucntion ask for the input and keep asking if ERROR exists **/
 type_prompt() ;
 fgets(input, 4098,stdin); //Reads the input MAX size is 4098
-
 while(read_error_check(input)){
     type_prompt();
     fgets(input, 4098,stdin);
-
 }
-
 }
 
 
 void child_die_handler(int sig){
+static unsigned char open_flag = 0;
 
-pid_t pid;
-pid= wait(NULL);
 
+
+
+    FILE *log_p = fopen("logfile.txt" , "a");
+    if(open_flag == 0){
+    fprintf(log_p, "Shell new session  %s \n",time_stamper());
+    open_flag = 1 ;
+    }
+
+	fprintf(log_p, "Child process was terminated ,%s \n",time_stamper());
+    //fputs("Child process was terminated 3\n", fp);
+	fclose(log_p);
+
+
+}
+
+char * time_stamper(void){
 time_t rawtime;
 struct tm * timeinfo;
 time(&rawtime);
 timeinfo = localtime(&rawtime);
-
-
-
-
-printf("Death %d %s\n",pid,asctime(timeinfo));
-//signal(SIGCHLD,child_die_handler);
+return asctime(timeinfo) ;
 }
+
+
+
 
