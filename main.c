@@ -92,6 +92,7 @@ int main()
                 // Free the allocated mem for the input
                 FILE *log_p = fopen("logfile.log" , "a");
                 fprintf(log_p, "Shell session terminated %s \n",time_stamper());
+                fclose(log_p);
                 free(input);
                 exit(0);
         }
